@@ -45,7 +45,7 @@ defmodule BinaryDiagnostic do
           |> get_bit_values_at_position(bit_position)
           |> filter_fn.()
 
-        case calc_remaining_numbers(remaining_numbers, bit_position, filter_bit_value) do
+        case filter_remaining_numbers(remaining_numbers, bit_position, filter_bit_value) do
           [last_number] -> {:halt, calc_rating(last_number)}
           updated_remaining_numbers -> {:cont, updated_remaining_numbers}  
         end
@@ -56,7 +56,7 @@ defmodule BinaryDiagnostic do
     Enum.map(numbers, &Enum.at(&1, bit_position))
   end
 
-  defp calc_remaining_numbers(numbers, bit_position, filter_value) do
+  defp filter_remaining_numbers(numbers, bit_position, filter_value) do
     Enum.filter(numbers, &(Enum.at(&1, bit_position) == filter_value))
   end
 

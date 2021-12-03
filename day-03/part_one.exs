@@ -45,7 +45,6 @@ defmodule BinaryDiagnostic do
     |> Enum.join()
     |> String.to_integer(2)
   end
-
 end
 
 IO.inspect(BinaryDiagnostic.run())
