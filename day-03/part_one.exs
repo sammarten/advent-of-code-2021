@@ -25,13 +25,9 @@ defmodule BinaryDiagnostic do
   end
 
   defp calc_power_consumption(frequencies) do
-    [gamma_rate, epsilon_rate] =
-      Enum.map(
-        [&gamma_rate_mask/1, &epsilon_rate_mask/1],
-        &calc_rate(frequencies, &1)
-      )
-
-    gamma_rate * epsilon_rate
+    [&gamma_rate_mask/1, &epsilon_rate_mask/1]
+    |> Enum.map(&calc_rate(frequencies, &1))
+    |> Enum.product()
   end
 
   defp gamma_rate_mask(value), do: round(value)
