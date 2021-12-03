@@ -40,16 +40,19 @@ defmodule BinaryDiagnostic do
     |> Enum.reduce_while(
       numbers,
       fn bit_position, remaining_numbers ->
-        filter_bit_value = 
-          remaining_numbers
-          |> get_bit_values_at_position(bit_position)
-          |> filter_fn.()
+        filter_bit_value = calc_filter_bit_value(remaining_numbers, bit_position, filter_fn)
 
         case filter_remaining_numbers(remaining_numbers, bit_position, filter_bit_value) do
           [last_number] -> {:halt, calc_rating(last_number)}
           updated_remaining_numbers -> {:cont, updated_remaining_numbers}  
         end
       end)
+  end
+
+  defp calc_filter_bit_value(numbers, bit_position, filter_fn) do
+    numbers
+    |> get_bit_values_at_position(bit_position)
+    |> filter_fn.()
   end
 
   defp get_bit_values_at_position(numbers, bit_position) do
