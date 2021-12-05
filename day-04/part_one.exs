@@ -20,7 +20,9 @@ defmodule GiantSquid do
   end
 
   def parse_numbers(numbers) do
-    String.split(numbers, ",")
+    numbers
+    |> String.split(",")
+    |> Enum.map(&String.to_integer/1)
   end
 
   def parse_boards(boards) do
@@ -35,19 +37,14 @@ defmodule GiantSquid do
       board
       |> Enum.map(&String.trim/1)
       |> Enum.map(&String.split(&1, ~r/\s+/, trim: true))
+      |> Enum.map(&Enum.map(&1, fn number -> String.to_integer(number) end))
 
     %{
       rows: rows,
-      cols: cols_from_rows(rows)
+      cols: rows |> Enum.zip() |> Enum.map(&Tuple.to_list/1),
+      numbers: List.flatten(rows)
     }
   end
-
-  defp cols_from_rows(rows) do
-    rows
-    |> Enum.zip()
-    |> Enum.map(&Tuple.to_list/1)
-  end
-
 
   def play_bingo(%{boards: boards, numbers: numbers}) do
     Enum.reduce_while(
@@ -56,22 +53,22 @@ defmodule GiantSquid do
       fn number, played_numbers ->
         updated_played_numbers = [number | played_numbers]
 
-        if length(updated_played_numbers) >= 5 do
-          case check_for_winner(boards, updated_played_numbers) do
-            [winning_board] ->
-              {:halt, calc_winning_score(winning_board, updated_played_numbers, number)}
+        case check_for_winner(boards, updated_played_numbers) do
+          [winning_board] ->
+            {:halt, calc_winning_score(winning_board, updated_played_numbers, number)}
 
-            [] ->
-              {:cont, updated_played_numbers}
-          end
-        else
-          {:cont, updated_played_numbers}
+          [] ->
+            {:cont, updated_played_numbers}
         end
       end)
   end
 
   def check_for_winner(boards, played_numbers) do
-    Enum.filter(boards, &(has_winning_row?(&1, played_numbers) || has_winning_column?(&1, played_numbers)))
+    if length(played_numbers) < 5 do
+      []
+    else
+      Enum.filter(boards, &(has_winning_row?(&1, played_numbers) || has_winning_column?(&1, played_numbers)))
+    end
   end
 
   def has_winning_row?(%{rows: rows}, played_numbers) do
@@ -100,14 +97,11 @@ defmodule GiantSquid do
       end)
   end
 
-  def calc_winning_score(%{cols: cols, rows: rows}, played_numbers, last_number) do
-    rows ++ cols
-    |> List.flatten()
-    |> Enum.uniq()
+  def calc_winning_score(%{numbers: numbers}, played_numbers, last_number) do
+    numbers
     |> Kernel.--(played_numbers)
-    |> Enum.map(&String.to_integer/1)
     |> Enum.sum()
-    |> Kernel.*(String.to_integer(last_number))
+    |> Kernel.*(last_number)
   end
 end
 
