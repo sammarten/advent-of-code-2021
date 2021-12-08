@@ -23,7 +23,6 @@ defmodule Lanternfish do
   end
 
   def simulate_day(day, %{existing: existing, new: new}) do
-    IO.puts "Simulating day #{day}..."
     Enum.reduce(
       existing ++ new, 
       %{existing: [], new: []},

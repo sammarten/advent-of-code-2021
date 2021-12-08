@@ -64,4 +64,4 @@ defmodule HydrothermalVenture do
   end
 end
 
-IO.inspect(HydrothermalVenture.run("input.txt"))
+IO.inspect(HydrothermalVenture.run())
